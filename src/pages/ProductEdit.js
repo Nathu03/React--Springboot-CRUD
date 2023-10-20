@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, useHistory, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function ProductEdit() {
   const { id } = useParams();
-//   const history = useHistory();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -13,7 +12,7 @@ function ProductEdit() {
 
   useEffect(() => {
     // Fetch the product data based on the productId from the URL parameter
-    axios.get(`http://localhost:8080/api/products/1`)
+    axios.get(`http://localhost:8080/api/products/${id}`)
       .then(response => {
         const product = response.data;
   
@@ -42,7 +41,7 @@ function ProductEdit() {
 
         console.log('Product updated successfully:', response.data);
         // Redirect to the product list page after successful update
-        navigate('/home');
+        navigate('/product-list');
       })
       .catch(error => {
         setErrorMessage('Error updating product. Please try again.');
@@ -57,22 +56,36 @@ function ProductEdit() {
   return (
     <div className="container mt-5">
       <h1 className="mb-4">Edit Product</h1>
-      {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+      {/* Your success and error messages go here */}
       <form onSubmit={handleUpdate}>
         <div className="mb-3">
           <label htmlFor="productName" className="form-label">Name:</label>
-          <input type="text" className="form-control" id="productName" value={name} readOnly />
+          <input
+            type="text"
+            className="form-control"
+            id="productName"
+            value={name}
+            onChange={(e) => setName(e.target.value)} // Update name state when the input changes
+          />
         </div>
         <div className="mb-3">
           <label htmlFor="productPrice" className="form-label">Price:</label>
-          <input type="number" className="form-control" id="productPrice" value={price} readOnly />
+          <input
+            type="number"
+            className="form-control"
+            id="productPrice"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)} // Update price state when the input changes
+          />
         </div>
         <button type="submit" className="btn btn-primary me-2">Update Product</button>
-        <button type="button" className="btn btn-secondary" onClick={() => history.push('/product-list')}>Cancel</button>
+        {/* Add a cancel button */}
+        <button type="button" className="btn btn-secondary" onClick={() => navigate('/product-list')}>
+          Cancel
+        </button>
       </form>
     </div>
   );
-}
+};
 
 export default ProductEdit;
