@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-
+import { Link, useLocation } from 'react-router-dom';
 
 function ProductList() {
+  const location = useLocation();
+  const buttonClicked = location.state?.buttonClicked || false;
+
   const [products, setProducts] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    // Clear success message after 2 seconds
+    const timer = setTimeout(() => {
+      setSuccessMessage('');
+    }, 2000);
+
+    // Clear the timer if the component unmounts or successMessage changes
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
   const fetchProducts = () => {
     axios.get('http://localhost:8080/api/products')
@@ -21,19 +34,38 @@ function ProductList() {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:8080/api/products/${id}`)
-      .then(() => {
-        console.log('Product deleted successfully!');
-        fetchProducts(); // Refresh product list after deletion
-      })
-      .catch(error => {
-        console.error('Error deleting product:', error);
-      });
+    const userResponse = window.prompt('Type "yes" if you want to delete this product.');
+  
+    if (userResponse && userResponse.toLowerCase() === 'yes') {
+      axios.delete(`http://localhost:8080/api/products/${id}`)
+        .then(() => {
+          console.log('Product deleted successfully!');
+          setSuccessMessage('Product deleted successfully!');
+          fetchProducts(); // Refresh product list after deletion
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 2000); // Hide success message after 2 seconds
+        })
+        .catch(error => {
+          console.error('Error deleting product:', error);
+          alert('Error deleting product: ' + error.message);
+        });
+    } else {
+      console.log('Deletion canceled.');
+    }
   };
+  
+  
 
   return (
     <div className="container mt-5">
       <h1 className="mb-4">Product List</h1>
+      {successMessage && (
+        <div className="alert alert-success" role="alert">
+          {successMessage}
+        </div>
+      )}
+      {buttonClicked && <div className="alert alert-success">Product updated Successfully!</div>}
       <ul className="list-group">
         <li className="list-group-item d-flex justify-content-between align-items-center fw-bold">
           Name
