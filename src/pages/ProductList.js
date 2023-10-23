@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
+import './ProductList.css'
 
 function ProductList() {
   const location = useLocation();
-  const buttonClicked = location.state?.buttonClicked || false;
+  const [buttonClicked, setButtonClicked] = useState(location.state?.buttonClicked || false);
+
+  useEffect(() => {
+    // If buttonClicked is initially true, set it to false after 2 seconds
+    if (buttonClicked) {
+      const timer = setTimeout(() => {
+        setButtonClicked(false);
+      }, 2000);
+
+      // Clear the timer when the component unmounts to prevent memory leaks
+      return () => clearTimeout(timer);
+    }
+    // Dependency array is empty, so this effect will run once after the initial render
+  }, [buttonClicked]);
 
   const [products, setProducts] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
