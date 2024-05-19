@@ -75,7 +75,7 @@ function ProductList() {
     <div className="container mt-5">
       <h1 className="mb-4">Product List</h1>
       {successMessage && (
-        <div className="alert alert-success" role="alert">
+        <div className="alert alert-danger" role="alert">
           {successMessage}
         </div>
       )}
